@@ -10,4 +10,8 @@
 
 body {
   @apply bg-gray-50;
+  background-image: url('https://placehold.co/1920x1080/000000/FFFFFF?text=Background+Image');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
