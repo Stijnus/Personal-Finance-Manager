@@ -3,7 +3,7 @@ import { useFinance } from '../context/FinanceContext'
 import { FiPlus } from 'react-icons/fi'
 
 const TransactionForm = () => {
-  const { dispatch } = useFinance()
+  const { state, dispatch } = useFinance()
   const [formData, setFormData] = useState({
     amount: '',
     category: '',
@@ -42,7 +42,7 @@ const TransactionForm = () => {
             required
           >
             <option value="">Select Category</option>
-            {initialState.categories.map(cat => (
+            {state.categories.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
