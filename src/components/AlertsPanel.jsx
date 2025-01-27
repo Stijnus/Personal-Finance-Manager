@@ -1,6 +1,6 @@
 import React from 'react'
 import { useFinance } from '../context/FinanceContext'
-import { FiAlertTriangle } from 'react-icons/fi'
+import { FiAlertTriangle, FiBell } from 'react-icons/fi'
 
 const AlertsPanel = () => {
   const { state } = useFinance()
@@ -14,7 +14,7 @@ const AlertsPanel = () => {
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Budget Alerts</h2>
+      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><FiBell className="w-6 h-6"/>Budget Alerts</h2>
       {alerts.length === 0 ? (
         <p className="text-gray-500">No active alerts</p>
       ) : (

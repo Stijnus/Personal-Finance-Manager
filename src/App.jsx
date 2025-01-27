@@ -4,6 +4,9 @@ import Dashboard from './components/Dashboard'
 import TransactionForm from './components/TransactionForm'
 import BudgetManager from './components/BudgetManager'
 import AlertsPanel from './components/AlertsPanel'
+import CategoryManager from './components/CategoryManager'
+import TransactionList from './components/TransactionList'
+import { FiTrendingUp, FiList, FiBell, FiTag, FiCreditCard } from 'react-icons/fi'
 
 const App = () => {
   return (
@@ -23,12 +26,14 @@ const App = () => {
             <div className="grid gap-6">
               <TransactionForm />
               <BudgetManager />
+              <CategoryManager />
             </div>
           </div>
           
           <div className="space-y-6">
             <AlertsPanel />
             <Dashboard />
+            <TransactionList />
           </div>
         </div>
       </div>

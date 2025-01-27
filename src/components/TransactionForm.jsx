@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useFinance } from '../context/FinanceContext'
-import { FiPlus } from 'react-icons/fi'
+import { FiPlus, FiCreditCard } from 'react-icons/fi'
 
 const TransactionForm = () => {
   const { state, dispatch } = useFinance()
@@ -8,7 +8,8 @@ const TransactionForm = () => {
     amount: '',
     category: '',
     date: new Date().toISOString().split('T')[0],
-    description: ''
+    description: '',
+    store: ''
   })
 
   const handleSubmit = (e) => {
@@ -19,12 +20,12 @@ const TransactionForm = () => {
       id: Date.now()
     }
     dispatch({ type: 'ADD_TRANSACTION', payload: newTransaction })
-    setFormData({ amount: '', category: '', date: '', description: '' })
+    setFormData({ amount: '', category: '', date: '', description: '', store: '' })
   }
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Add Transaction</h2>
+      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><FiCreditCard className="w-6 h-6"/>Add Transaction</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
@@ -60,6 +61,16 @@ const TransactionForm = () => {
             value={formData.description}
             onChange={e => setFormData({...formData, description: e.target.value})}
           />
+          <select
+            className="p-2 border rounded-lg focus:ring-2 focus:ring-primary"
+            value={formData.store}
+            onChange={e => setFormData({...formData, store: e.target.value})}
+          >
+            <option value="">Select Store</option>
+            {state.stores.map(store => (
+              <option key={store} value={store}>{store}</option>
+            ))}
+          </select>
         </div>
         <button
           type="submit"

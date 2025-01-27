@@ -1,6 +1,7 @@
 import React from 'react'
 import { useFinance } from '../context/FinanceContext'
 import Chart from 'react-apexcharts'
+import { FiPieChart } from 'react-icons/fi'
 
 const Dashboard = () => {
   const { state } = useFinance()
@@ -21,7 +22,7 @@ const Dashboard = () => {
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Spending Overview</h2>
+      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><FiPieChart className="w-6 h-6"/>Spending Overview</h2>
       <Chart
         options={chartData.options}
         series={chartData.series}
