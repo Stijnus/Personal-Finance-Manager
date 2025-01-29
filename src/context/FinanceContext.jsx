@@ -7,6 +7,7 @@ const initialState = {
   budgets: [],
   categories: ['Food', 'Housing', 'Transport', 'Entertainment', 'Utilities'],
   stores: ['Aldi', 'Ikea', 'Carrefour', 'Walmart', 'Amazon', 'Target'],
+  users: [],
   searchTerm: ''
 }
 
@@ -18,7 +19,8 @@ const financeReducer = (state, action) => {
         transactions: action.payload.transactions,
         budgets: action.payload.budgets,
         categories: action.payload.categories || state.categories,
-        stores: action.payload.stores || state.stores
+        stores: action.payload.stores || state.stores,
+        users: action.payload.users || state.users
       }
     case 'ADD_TRANSACTION':
       return { ...state, transactions: [...state.transactions, action.payload] }
@@ -49,6 +51,34 @@ const financeReducer = (state, action) => {
         ),
         budgets: state.budgets.filter(budget => budget.category !== action.payload)
       }
+      case 'ADD_STORE':
+        return { ...state, stores: [...state.stores, action.payload] }
+      case 'EDIT_STORE':
+        return {
+          ...state,
+          stores: state.stores.map(store =>
+            store === action.payload.oldStore ? action.payload.newStore : store
+          )
+        }
+      case 'DELETE_STORE':
+        return {
+          ...state,
+          stores: state.stores.filter(store => store !== action.payload)
+        }
+      case 'ADD_USER':
+        return { ...state, users: [...state.users, action.payload] }
+      case 'EDIT_USER':
+        return {
+          ...state,
+          users: state.users.map(user =>
+            user.id === action.payload.id ? action.payload : user
+          )
+        }
+      case 'DELETE_USER':
+        return {
+          ...state,
+          users: state.users.filter(user => user.id !== action.payload)
+        }
     case 'SET_SEARCH_TERM':
       return { ...state, searchTerm: action.payload }
     default:
@@ -64,9 +94,10 @@ export const FinanceProvider = ({ children }) => {
     const savedBudgets = JSON.parse(localStorage.getItem('budgets')) || []
     const savedCategories = JSON.parse(localStorage.getItem('categories')) || []
     const savedStores = JSON.parse(localStorage.getItem('stores')) || []
+    const savedUsers = JSON.parse(localStorage.getItem('users')) || []
     dispatch({
       type: 'LOAD_DATA',
-      payload: { transactions: savedTransactions, budgets: savedBudgets, categories: savedCategories, stores: savedStores }
+      payload: { transactions: savedTransactions, budgets: savedBudgets, categories: savedCategories, stores: savedStores, users: savedUsers }
     })
   }, [])
 
@@ -75,7 +106,8 @@ export const FinanceProvider = ({ children }) => {
     localStorage.setItem('budgets', JSON.stringify(state.budgets))
     localStorage.setItem('categories', JSON.stringify(state.categories))
     localStorage.setItem('stores', JSON.stringify(state.stores))
-  }, [state.transactions, state.budgets, state.categories, state.stores])
+    localStorage.setItem('users', JSON.stringify(state.users))
+  }, [state.transactions, state.budgets, state.categories, state.stores, state.users])
 
   return (
     <FinanceContext.Provider value={{ state, dispatch }}>
