@@ -1,54 +1,67 @@
 import React, { useState } from 'react'
 import { FinanceProvider } from './context/FinanceContext'
+import { Toaster } from 'react-hot-toast'
 import Dashboard from './components/Dashboard'
-import TransactionForm from './components/TransactionForm'
-import BudgetManager from './components/BudgetManager'
-import AlertsPanel from './components/AlertsPanel'
-import CategoryManager from './components/CategoryManager'
-import TransactionList from './components/TransactionList'
 import SettingsPage from './components/SettingsPage'
-import { FiTrendingUp, FiList, FiBell, FiTag, FiCreditCard, FiSettings } from 'react-icons/fi'
+import AlertsPanel from './components/AlertsPanel'
+import { FiSettings } from 'react-icons/fi'
+import ErrorBoundary from './components/ErrorBoundary'
 
-const App = () => {
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-
-  const toggleSettings = () => {
-    setIsSettingsOpen(!isSettingsOpen)
-  }
+function App() {
+  const [showSettings, setShowSettings] = useState(false)
 
   return (
     <FinanceProvider>
-      <div className="container mx-auto p-4 md:p-6">
-        <header className="mb-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold flex items-center gap-2 text-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Personal Finance Manager
-          </h1>
-          <button onClick={toggleSettings} className="text-gray-500 hover:text-gray-700 flex items-center gap-2">
-            <FiSettings className="w-6 h-6" />
-          </button>
-        </header>
-
-        {isSettingsOpen && <SettingsPage onClose={toggleSettings} />}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <div className="grid gap-6">
-              <TransactionForm />
-              <BudgetManager />
-              <CategoryManager />
+      <ErrorBoundary>
+        <div className="min-h-screen bg-gray-100">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-3xl font-bold">Personal Finance Manager</h1>
+              <button
+                onClick={() => setShowSettings(true)}
+                className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              >
+                <FiSettings className="w-5 h-5" />
+                Settings
+              </button>
             </div>
-          </div>
-          
-          <div className="space-y-6">
-            <AlertsPanel />
+            
             <Dashboard />
-            <TransactionList />
+            <div className="mt-8">
+              <AlertsPanel />
+            </div>
+            
+            {showSettings && (
+              <ErrorBoundary>
+                <SettingsPage onClose={() => setShowSettings(false)} />
+              </ErrorBoundary>
+            )}
           </div>
+
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#333',
+                color: '#fff',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#22c55e',
+                  secondary: 'white',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: 'white',
+                },
+              },
+            }}
+          />
         </div>
-      </div>
+      </ErrorBoundary>
     </FinanceProvider>
   )
 }

@@ -1,151 +1,117 @@
-import React, { useState } from 'react'
-import { useFinance } from '../context/FinanceContext'
-import { FiUserPlus, FiSettings, FiSave, FiX, FiTrash2, FiEdit, FiPlusSquare } from 'react-icons/fi'
-import { v4 as uuidv4 } from 'uuid';
+// src/components/SettingsPage.jsx
+import React, { useState } from "react";
+import { useFinance } from "../context/FinanceContext";
+import { FiSettings, FiX, FiTrash2 } from "react-icons/fi";
+import CategoryManager from "./CategoryManager";
+import BudgetManager from "./BudgetManager";
+import StoreManager from "./StoreManager";
+import RecurringTransactions from "./RecurringTransactions";
+import TransactionTemplates from "./TransactionTemplates";
+import ImportExport from "./ImportExport";
+import UserManager from "./UserManager";
+import Tabs from "./Tabs";
+import toast from 'react-hot-toast';
 
 const SettingsPage = ({ onClose }) => {
-  const { state, dispatch } = useFinance()
-  const [editingUser, setEditingUser] = useState(null);
-  const [newUser, setNewUser] = useState({ id: '', name: '' });
-  const [editingStore, setEditingStore] = useState(null);
-  const [newStore, setNewStore] = useState('');
+  const { t, resetToDefaults, restoreData, handleBackup } = useFinance();
+  const [resetting, setResetting] = useState(false);
 
-
-  const handleAddUser = () => {
-    const newUserId = uuidv4();
-    dispatch({ type: 'ADD_USER', payload: { id: newUserId, name: newUser.name } });
-    setNewUser({ id: '', name: '' });
-  };
-
-  const handleEditUser = (user) => {
-    setEditingUser(user);
-    setNewUser({ id: user.id, name: user.name });
-  };
-
-  const handleSaveUser = () => {
-    if (editingUser) {
-      dispatch({ type: 'EDIT_USER', payload: newUser });
-    } else {
-      handleAddUser();
-    }
-    setEditingUser(null);
-    setNewUser({ id: '', name: '' });
-  };
-
-  const handleDeleteUser = (userId) => {
-    dispatch({ type: 'DELETE_USER', payload: userId });
-  };
-
-  const handleAddStore = () => {
-    if (newStore.trim() !== '') {
-      dispatch({ type: 'ADD_STORE', payload: newStore });
-      setNewStore('');
+  const handleClearAll = async () => {
+    if (resetting) return; // Prevent multiple clicks
+    
+    if (window.confirm(t("clearAllSettingsConfirm"))) {
+      setResetting(true);
+      
+      try {
+        const success = await resetToDefaults();
+        if (success) {
+          // Reload the page to ensure clean state
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('Reset failed:', error);
+        toast.error(t("resetError"));
+        setResetting(false);
+      }
     }
   };
 
-  const handleEditStore = (store) => {
-    setEditingStore(store);
-    setNewStore(store);
-  };
-
-  const handleSaveStore = () => {
-    if (editingStore) {
-      dispatch({ type: 'EDIT_STORE', payload: { oldStore: editingStore, newStore: newStore } });
-    } else {
-      handleAddStore();
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        try {
+          const backup = JSON.parse(event.target.result)
+          restoreData(backup)
+        } catch (error) {
+          toast.error(t('invalidBackupFile'))
+        }
+      }
+      reader.readAsText(file)
     }
-    setEditingStore(null);
-    setNewStore('');
   };
 
-  const handleDeleteStore = (store) => {
-    dispatch({ type: 'DELETE_STORE', payload: store });
-  };
+  const tabs = [
+    { label: t("categories"), content: <CategoryManager /> },
+    { label: t("budgets"), content: <BudgetManager /> },
+    { label: t("stores"), content: <StoreManager /> },
+    { label: t("users"), content: <UserManager /> },
+    { label: t("recurringTransactions"), content: <RecurringTransactions /> },
+    { label: t("transactionTemplates"), content: <TransactionTemplates /> },
+    { label: t("importExport"), content: <ImportExport /> },
+    { label: t('system'), content: (
+      <div className="space-y-4">
+        <div className="bg-yellow-50 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">{t('dangerZone')}</h3>
+          <button onClick={handleBackup} className="bg-blue-500 text-white px-4 py-2 rounded">
+            {t('createBackup')}
+          </button>
+          <input type="file" onChange={handleFileUpload} className="ml-4" />
+        </div>
+      </div>
+    )},
+  ];
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-1/2 md:w-2/3 lg:w-1/2 xl:w-1/3 2xl:w-1/4 shadow-lg rounded-md bg-white">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold flex items-center gap-2">
-            <FiSettings className="w-6 h-6" /> Settings
-          </h3>
-          <button onClick={onClose} className="text-red-500 hover:text-red-700 p-1 rounded focus:outline-none">
-            <FiX className="w-5 h-5" />
-          </button>
-        </div>
+      <div className="relative top-20 mx-auto p-8 border w-3/4 shadow-lg rounded-md bg-white max-w-[95%]">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+        >
+          <FiX />
+        </button>
 
-        <div className="mb-6">
-          <h4 className="text-md font-semibold mb-2 flex items-center gap-2">
-            <FiUserPlus className="w-4 h-4" /> Manage Users
-          </h4>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={newUser.name}
-              onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-              placeholder="User Name"
-              className="border border-gray-300 px-3 py-2 rounded flex-grow"
-            />
-            <button onClick={handleSaveUser} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex-shrink-0">
-              <FiSave className="mr-1" /> {editingUser ? 'Save' : 'Add'}
-            </button>
-          </div>
-          <ul>
-            {state.users && state.users.length > 0 ? (
-              state.users.map((user) => (
-                <li key={user.id} className="flex items-center justify-between mb-2 border rounded p-2">
-                  <span>{user.name}</span>
-                  <div className="flex space-x-2">
-                    <button onClick={() => handleEditUser(user)} className="text-yellow-500 hover:text-yellow-700 p-1 rounded focus:outline-none">
-                      <FiEdit className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => handleDeleteUser(user.id)} className="text-red-500 hover:text-red-700 p-1 rounded focus:outline-none">
-                      <FiTrash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </li>
-              ))
-            ) : (
-              <p>No users found.</p>
-            )}
-          </ul>
-        </div>
+        <button
+          onClick={handleClearAll}
+          disabled={resetting}
+          className={`absolute top-2 right-12 ${
+            resetting ? 'bg-gray-400' : 'bg-yellow-500 hover:bg-yellow-700'
+          } text-white font-bold py-1 px-2 rounded flex items-center gap-1`}
+        >
+          {resetting ? (
+            <>
+              <span className="animate-spin">⟳</span>
+              {t("resetting")}
+            </>
+          ) : (
+            <>
+              <FiTrash2 />
+              {t("clearAll")}
+            </>
+          )}
+        </button>
 
-        <div>
-          <h4 className="text-md font-semibold mb-2 flex items-center gap-2">
-            <FiPlusSquare className="w-4 h-4" /> Manage Stores
-          </h4>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              value={newStore}
-              onChange={(e) => setNewStore(e.target.value)}
-              placeholder="Store Name"
-              className="border border-gray-300 px-3 py-2 rounded flex-grow"
-            />
-            <button onClick={handleSaveStore} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex-shrink-0">
-              <FiSave className="mr-1" /> {editingStore ? 'Save' : 'Add'}
-            </button>
-          </div>
-          <ul>
-            {state.stores.map((store) => (
-              <li key={store} className="flex items-center justify-between mb-2 border rounded p-2">
-                <span>{store}</span>
-                <div className="flex space-x-2">
-                  <button onClick={() => handleEditStore(store)} className="text-yellow-500 hover:text-yellow-700 p-1 rounded focus:outline-none">
-                    <FiEdit className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => handleDeleteStore(store)} className="text-red-500 hover:text-red-700 p-1 rounded focus:outline-none">
-                    <FiTrash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+          <FiSettings className="w-6 h-6" />
+          {t("settings")}
+        </h2>
+
+        <Tabs tabs={tabs} />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SettingsPage
+export default SettingsPage;

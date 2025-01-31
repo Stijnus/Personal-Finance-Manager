@@ -1,88 +1,66 @@
-import React, { useState } from 'react'
-import { useFinance } from '../context/FinanceContext'
-import { FiEdit, FiTrash2, FiPlus, FiTag } from 'react-icons/fi'
+import React, { useState } from 'react';
+import { useFinance } from '../context/FinanceContext';
 
 const CategoryManager = () => {
-  const { state, dispatch } = useFinance()
-  const [newCategory, setNewCategory] = useState('')
-  const [editCategory, setEditCategory] = useState({ oldCategory: '', newCategory: '' })
-  const [isEditing, setIsEditing] = useState(false)
+  const { t, categories = [], dispatch } = useFinance();
+  const [newCategory, setNewCategory] = useState('');
 
-  const handleAddCategory = () => {
-    if (newCategory.trim() !== '') {
-      dispatch({ type: 'ADD_CATEGORY', payload: newCategory })
-      setNewCategory('')
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (newCategory.trim()) {
+      dispatch({
+        type: 'ADD_CATEGORY',
+        payload: newCategory.trim()
+      });
+      setNewCategory('');
     }
-  }
+  };
 
-  const handleEditCategory = (category) => {
-    setEditCategory({ oldCategory: category, newCategory: category })
-    setIsEditing(true)
-  }
-
-  const handleSaveEdit = () => {
-    dispatch({ type: 'EDIT_CATEGORY', payload: editCategory })
-    setIsEditing(false)
-    setEditCategory({ oldCategory: '', newCategory: '' })
-  }
-
-  const handleDeleteCategory = (category) => {
-    dispatch({ type: 'DELETE_CATEGORY', payload: category })
-  }
+  const handleDelete = (category) => {
+    if (window.confirm(t('confirmDeleteCategory'))) {
+      dispatch({
+        type: 'DELETE_CATEGORY',
+        payload: category
+      });
+    }
+  };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm">
-      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2"><FiTag className="w-6 h-6"/>Category Management</h2>
-
-      <div className="mb-4 flex gap-2">
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium mb-4">{t('categories')}</h3>
+      
+      <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           type="text"
-          placeholder="New Category"
+          placeholder={t('newCategory')}
           className="p-2 border rounded-lg flex-1"
           value={newCategory}
-          onChange={e => setNewCategory(e.target.value)}
+          onChange={(e) => setNewCategory(e.target.value)}
+          required
         />
         <button
-          onClick={handleAddCategory}
-          className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          <FiPlus className="w-4 h-4" />
+          {t('add')}
         </button>
-      </div>
+      </form>
 
-      <ul className="space-y-2">
-        {state.categories.map(category => (
-          <li key={category} className="flex items-center justify-between p-2 border rounded-lg">
-            {isEditing && editCategory.oldCategory === category ? (
-              <div className="flex gap-2 items-center">
-                <input
-                  type="text"
-                  className="p-1 border rounded-lg"
-                  value={editCategory.newCategory}
-                  onChange={e => setEditCategory({ ...editCategory, newCategory: e.target.value })}
-                />
-                <button onClick={handleSaveEdit} className="text-green-500 hover:text-green-700 flex items-center gap-1">
-                  Save
-                </button>
-              </div>
-            ) : (
-              <span>{category}</span>
-            )}
-            <div className="flex gap-2">
-              {!isEditing && (
-                <button onClick={() => handleEditCategory(category)} className="text-blue-500 hover:text-blue-700 flex items-center gap-1">
-                  <FiEdit className="w-4 h-4" />
-                </button>
-              )}
-              <button onClick={() => handleDeleteCategory(category)} className="text-red-500 hover:text-red-700 flex items-center gap-1">
-                <FiTrash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </li>
+      <div className="space-y-2">
+        {categories.map((category, index) => (
+          <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+            <span>{category}</span>
+            <button
+              onClick={() => handleDelete(category)}
+              className="text-red-600 hover:text-red-700"
+            >
+              {t('delete')}
+            </button>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default CategoryManager
+export default CategoryManager;
