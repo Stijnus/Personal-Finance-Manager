@@ -1,5 +1,39 @@
 import React, { useState } from 'react';
 import { useFinance } from '../context/FinanceContext';
+import { 
+  FaUtensils, 
+  FaCar, 
+  FaFilm, 
+  FaShoppingCart, 
+  FaFileInvoiceDollar,
+  FaHeartbeat,
+  FaGift,
+  FaPiggyBank,
+  FaPlane,
+  FaBook,
+  FaHome,
+  FaQuestionCircle
+} from 'react-icons/fa';
+
+const categoryIcons = {
+  food: <FaUtensils className="w-4 h-4" />,
+  transport: <FaCar className="w-4 h-4" />,
+  entertainment: <FaFilm className="w-4 h-4" />,
+  shopping: <FaShoppingCart className="w-4 h-4" />,
+  bills: <FaFileInvoiceDollar className="w-4 h-4" />,
+  health: <FaHeartbeat className="w-4 h-4" />,
+  gifts: <FaGift className="w-4 h-4" />,
+  savings: <FaPiggyBank className="w-4 h-4" />,
+  travel: <FaPlane className="w-4 h-4" />,
+  education: <FaBook className="w-4 h-4" />,
+  housing: <FaHome className="w-4 h-4" />,
+  other: <FaQuestionCircle className="w-4 h-4" />
+};
+
+const getCategoryIcon = (category) => {
+  const lowerCategory = category.toLowerCase();
+  return categoryIcons[lowerCategory] || categoryIcons.other;
+};
 
 const CategoryManager = () => {
   const { t, categories = [], dispatch } = useFinance();
@@ -49,7 +83,12 @@ const CategoryManager = () => {
       <div className="space-y-2">
         {categories.map((category, index) => (
           <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-            <span>{category}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500">
+                {getCategoryIcon(category)}
+              </span>
+              <span>{category}</span>
+            </div>
             <button
               onClick={() => handleDelete(category)}
               className="text-red-600 hover:text-red-700"

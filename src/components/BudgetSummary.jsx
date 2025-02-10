@@ -41,7 +41,7 @@ const BudgetSummary = () => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-semibold mb-4">{t('monthlyBudget')}</h2>
-      
+
       {/* Overall summary */}
       <div className="grid grid-cols-3 gap-4 mb-6 bg-gray-50 p-4 rounded-lg">
         <div>

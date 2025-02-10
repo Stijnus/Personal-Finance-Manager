@@ -1,6 +1,15 @@
-// src/components/UserManager.jsx
 import React, { useState } from "react";
 import { useFinance } from "../context/FinanceContext";
+import { FaUser, FaUserShield } from 'react-icons/fa';
+
+const userIcons = {
+  user: <FaUser className="w-4 h-4" />,
+  admin: <FaUserShield className="w-4 h-4" />
+};
+
+const getUserIcon = (role) => {
+  return userIcons[role] || userIcons.user;
+};
 
 const UserManager = () => {
   const { t, users = [], dispatch } = useFinance();
@@ -53,9 +62,14 @@ const UserManager = () => {
       <div className="space-y-2">
         {users.map((user) => (
           <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg">
-            <div>
-              <span className="font-medium">{user.name}</span>
-              <span className="ml-2 text-sm text-gray-600">({t(user.role)})</span>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500">
+                {getUserIcon(user.role)}
+              </span>
+              <div>
+                <span className="font-medium">{user.name}</span>
+                <span className="ml-2 text-sm text-gray-600">({t(user.role)})</span>
+              </div>
             </div>
             <button
               onClick={() => dispatch({ type: "DELETE_USER", payload: user.id })}

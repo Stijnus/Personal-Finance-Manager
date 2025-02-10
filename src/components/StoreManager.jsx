@@ -1,6 +1,19 @@
 import React, { useState } from 'react'
 import { useFinance } from '../context/FinanceContext'
 import { countries } from '../config/stores'
+import { FaStore, FaShoppingCart, FaBolt, FaTshirt, FaQuestionCircle } from 'react-icons/fa';
+
+const storeIcons = {
+  supermarket: <FaShoppingCart className="w-4 h-4" />,
+  electronics: <FaBolt className="w-4 h-4" />,
+  clothing: <FaTshirt className="w-4 h-4" />,
+  other: <FaQuestionCircle className="w-4 h-4" />
+};
+
+const getStoreIcon = (type) => {
+  const lowerType = type.toLowerCase();
+  return storeIcons[lowerType] || storeIcons.other;
+};
 
 const StoreManager = () => {
   const { stores = [], dispatch, t } = useFinance()
@@ -82,12 +95,17 @@ const StoreManager = () => {
       <div className="space-y-2">
         {stores.map(store => (
           <div key={store.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div className="flex-1">
-              <p className="font-medium">{store.name}</p>
-              <p className="text-sm text-gray-600">
-                {t(store.type)} • 
-                {countries.find(c => c.code === store.country)?.name}
-              </p>
+            <div className="flex-1 flex items-center gap-2">
+              <span className="text-gray-500">
+                {getStoreIcon(store.type)}
+              </span>
+              <div>
+                <p className="font-medium">{store.name}</p>
+                <p className="text-sm text-gray-600">
+                  {t(store.type)} • 
+                  {countries.find(c => c.code === store.country)?.name}
+                </p>
+              </div>
             </div>
             <div className="flex gap-2">
               <button
