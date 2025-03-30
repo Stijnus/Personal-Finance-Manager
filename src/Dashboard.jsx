@@ -12,7 +12,7 @@ const Dashboard = () => {
     transactions = [], 
     t, 
     language, 
-    dispatch, // Correctly using dispatch
+    dispatch,
     budgets = {},
     categories = [],
     formatAmount 
@@ -66,7 +66,6 @@ const Dashboard = () => {
     setShowTransactionForm(false)
   }
 
-  // Handler function to dispatch the language change
   const handleLanguageChange = (e) => {
     dispatch({
       type: 'SET_LANGUAGE',
@@ -91,7 +90,7 @@ const Dashboard = () => {
             <FiGlobe className="w-5 h-5 text-gray-600" />
             <select
               value={language}
-              onChange={handleLanguageChange} // Correctly using the handler
+              onChange={handleLanguageChange}
               className="p-2 border rounded-lg"
             >
               {languages.map((lang) => (
@@ -114,7 +113,7 @@ const Dashboard = () => {
               const budget = budgets[category] || 0
               const spent = monthlySpending[category] || 0
               const remaining = budget - spent
-              const percentage = budget > 0 ? (spent / budget) * 100 : 0 // Avoid division by zero
+              const percentage = (spent / budget) * 100
 
               return (
                 <div key={category} className="bg-gray-50 rounded-lg p-4">
